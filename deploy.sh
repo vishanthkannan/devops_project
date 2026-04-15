@@ -6,10 +6,10 @@ docker run --rm \
   -v ~/.kube:/root/.kube \
   -v $(pwd):/app \
   bitnami/kubectl:latest \
-  kubectl apply -f /app/deployment.yaml
+  apply -f /app/deployment.yaml
 
 docker run --rm \
   -v ~/.kube:/root/.kube \
   -v $(pwd):/app \
   bitnami/kubectl:latest \
-  kubectl apply -f /app/service.yaml
+  apply -f /app/service.yaml
