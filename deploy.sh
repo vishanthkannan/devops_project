@@ -2,17 +2,16 @@
 
 echo "Deploying to Kubernetes..."
 
-echo "Workspace path is: $WORKSPACE"
-ls -l $WORKSPACE   # debug (very important)
-
 docker run --rm \
-  -v $WORKSPACE:/app \
+  -v /var/jenkins_home/workspace/devops-final:/app \
   -v /root/.kube:/root/.kube \
+  --network host \
   bitnami/kubectl:latest \
   apply -f /app/deployment.yaml
 
 docker run --rm \
-  -v $WORKSPACE:/app \
+  -v /var/jenkins_home/workspace/devops-final:/app \
   -v /root/.kube:/root/.kube \
+  --network host \
   bitnami/kubectl:latest \
   apply -f /app/service.yaml
