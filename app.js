@@ -1,36 +1,64 @@
-// Import the express and path modules
-const express = require('express');
-const path = require('path');
+const express = require("express");
+const path = require("path");
 
-// Create an Express application
 const app = express();
+const PORT = 3000;
 
-// Define the port to run the server on, defaulting to 3000
-const PORT = process.env.PORT || 3000;
+app.use(express.json());
+app.use(express.static(__dirname));
 
-// 1. Basic Homepage Route
-// Sends an HTML file that contains a loading animation before displaying the greeting
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+// In-memory room data
+let rooms = [
+    { id: 101, status: "Available" },
+    { id: 102, status: "Occupied" },
+    { id: 103, status: "Available" },
+    { id: 104, status: "Reserved" },
+    { id: 105, status: "Available" }
+];
+
+// Routes
+app.get("/api/rooms", (req, res) => {
+    res.json(rooms);
 });
 
-// 2. API Info Route
-// Returns a JSON payload with project details and current timestamp
-app.get('/api/info', (req, res) => {
-  res.json({
-    project: 'DevOps Web Application',
-    status: 'Running',
-    timestamp: new Date().toISOString()
-  });
+app.post("/api/book/:id", (req, res) => {
+    const room = rooms.find(r => r.id == req.params.id);
+    if (room && room.status === "Available") {
+        room.status = "Occupied";
+    }
+    res.json(room);
 });
 
-// 3. Health Check Route
-// Used by DevOps tools (like Docker or Kubernetes) to verify the app is working
-app.get('/health', (req, res) => {
-  res.send('OK');
+app.post("/api/release/:id", (req, res) => {
+    const room = rooms.find(r => r.id == req.params.id);
+    if (room) {
+        room.status = "Available";
+    }
+    res.json(room);
 });
 
-// Start the app and listen on the specified port
-app.listen(PORT, () => {
-  console.log(`Server is running and listening on http://localhost:${PORT}`);
+// Metrics endpoint for Prometheus/Grafana
+app.get("/metrics", (req, res) => {
+    const total = rooms.length;
+    const occupied = rooms.filter(r => r.status === "Occupied").length;
+    const available = rooms.filter(r => r.status === "Available").length;
+
+    res.set("Content-Type", "text/plain");
+    res.send(`
+# HELP total_rooms Total number of rooms
+# TYPE total_rooms gauge
+total_rooms ${total}
+
+# HELP occupied_rooms Number of occupied rooms
+# TYPE occupied_rooms gauge
+occupied_rooms ${occupied}
+
+# HELP available_rooms Number of available rooms
+# TYPE available_rooms gauge
+available_rooms ${available}
+    `);
+});
+
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
 });
