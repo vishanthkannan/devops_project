@@ -2,4 +2,14 @@
 
 echo "Deploying to Kubernetes..."
 
-kubectl rollout restart deployment devops-app
+docker run --rm \
+  -v ~/.kube:/root/.kube \
+  -v $(pwd):/app \
+  bitnami/kubectl:latest \
+  kubectl apply -f /app/deployment.yaml
+
+docker run --rm \
+  -v ~/.kube:/root/.kube \
+  -v $(pwd):/app \
+  bitnami/kubectl:latest \
+  kubectl apply -f /app/service.yaml
