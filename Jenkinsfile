@@ -3,18 +3,6 @@ pipeline {
 
     stages {
 
-        stage('Clean Workspace') {
-            steps {
-                deleteDir()
-            }
-        }
-
-        stage('Clone Code') {
-            steps {
-                sh 'git clone https://github.com/vishanthkannan/devops_project.git .'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t devops-app .'
