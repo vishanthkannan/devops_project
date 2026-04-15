@@ -32,7 +32,7 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh './deploy.sh'
+                sh 'bash deploy.sh'
             }
         }
     }
