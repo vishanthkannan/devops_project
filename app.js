@@ -44,8 +44,9 @@ app.get("/metrics", (req, res) => {
     const available = rooms.filter(r => r.status === "Available").length;
 
     res.set("Content-Type", "text/plain");
-    res.send(`
-# HELP total_rooms Total number of rooms
+
+    res.send(
+`# HELP total_rooms Total number of rooms
 # TYPE total_rooms gauge
 total_rooms ${total}
 
@@ -56,7 +57,8 @@ occupied_rooms ${occupied}
 # HELP available_rooms Number of available rooms
 # TYPE available_rooms gauge
 available_rooms ${available}
-    `);
+`
+    );
 });
 
 app.listen(PORT, "0.0.0.0", () => {
